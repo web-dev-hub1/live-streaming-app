@@ -14,15 +14,15 @@ datasource db {
 }
 
 model User {
-  id         String    @id @unique @default(cuid())
-  userName   String    @unique
-  password   String    // Changed `Password` to `password` for consistency and removed nullable option
-  email      String    @unique
-  myStreams  Stream[]  @relation("CreatedStreams") // Updated relation name for clarity
-  coStreams  Stream[]  @relation("CoHostedStreams") // Updated relation name for clarity
-  role       Role      @default(USER)
-  createdAt  DateTime  @default(now()) // Added timestamps
-  updatedAt  DateTime  @updatedAt
+  id        String   @id @unique @default(cuid())
+  userName  String   @unique
+  password  String // Changed `Password` to `password` for consistency and removed nullable option
+  email     String   @unique
+  myStreams Stream[] @relation("CreatedStreams") // Updated relation name for clarity
+  coStreams Stream[] @relation("CoHostedStreams") // Updated relation name for clarity
+  role      Role     @default(USER)
+  createdAt DateTime @default(now()) // Added timestamps
+  updatedAt DateTime @updatedAt
 }
 
 model Stream {
@@ -52,4 +52,3 @@ enum Status {
   RUNNING
   COMPLETED
 }
-
