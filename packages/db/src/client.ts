@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-//adding this comment to check discord integration
+//adding this comment to check discord pull integration
 
 declare global {
   var prisma: PrismaClient | undefined;
