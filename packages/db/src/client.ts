@@ -3,10 +3,10 @@ import { PrismaClient } from "@prisma/client";
 //adding this comment to check discord pull integration
 
 declare global {
-  var prisma: PrismaClient | undefined;
+  var prismaClient: PrismaClient | undefined;
 }
 
 
-export const prisma = globalThis.prisma || new PrismaClient();
+export const prismaClient = globalThis.prismaClient || new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma;
+if (process.env.NODE_ENV !== "production") globalThis.prismaClient = prismaClient;

@@ -1,7 +1,12 @@
 import express, { Request, Response } from 'express';
-import { prisma } from '@repo/db'
+import { prismaClient } from '@repo/db'
+import { router } from './routes/v1';
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
+
+app.use(express.json());
+app.use("/api/v1", router);
+
 
 app.get('/', async (req: Request, res: Response) => {
     res.status(200).send('Hello World!');
