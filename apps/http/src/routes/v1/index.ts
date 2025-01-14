@@ -1,5 +1,5 @@
 import { signinSchema } from '@repo/shared-schema/sharedSchema';
-import { prismaClient } from '@repo/db/client';
+import { prisma } from '@repo/db/client';
 import { Router } from "express"
 import bcrypt  from "bcrypt";
 
@@ -15,7 +15,7 @@ router.post('/signin', async (req,res) =>{
         return
     }
     try {
-        const user = await prismaClient.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 email: signinData.data.email
             }

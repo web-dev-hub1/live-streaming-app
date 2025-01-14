@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { prismaClient } from '@repo/db/client'
+import { prisma } from '@repo/db/client'
 import { router } from './routes/v1';
 const app = express();
 const port = process.env.PORT || 5000;
