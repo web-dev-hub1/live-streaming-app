@@ -1,5 +1,5 @@
-import { signinSchema } from '@repo/shared-schema';
-import { prismaClient } from '@repo/db';
+import { signinSchema } from '@repo/shared-schema/sharedSchema';
+import { prismaClient } from '@repo/db/client';
 import { Router } from "express"
 import bcrypt  from "bcrypt";
 

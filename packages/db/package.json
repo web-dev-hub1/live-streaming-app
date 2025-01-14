@@ -4,11 +4,8 @@
   "description": "",
   "private": true,
   "main": "index.js",
-  "scripts": {
-    "build": "tsc -b"
-  },
   "exports": {
-    ".": "./src/client.ts"
+   "./client":"./src/client.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
-    "prisma": "^6.2.1"
+    "prisma": "^6.2.1",
+    "@repo/typescript-config":"workspace:*"
   }
 }
