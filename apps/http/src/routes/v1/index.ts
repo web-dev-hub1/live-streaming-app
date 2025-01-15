@@ -2,9 +2,11 @@ import { signinSchema } from '@repo/shared-schema/sharedSchema';
 import { prisma } from '@repo/db/client';
 import { Router } from "express"
 import bcrypt  from "bcrypt";
-
-
+import dotenv from 'dotenv';
 import jwt from "jsonwebtoken"
+
+dotenv.config();
+
 
 export const router: Router = Router();
 
