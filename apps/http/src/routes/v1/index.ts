@@ -46,4 +46,6 @@ router.post('/signin', async (req,res) =>{
 
 })
 
+export const sum=(a:number, b:number)=>a+b;
+
 
