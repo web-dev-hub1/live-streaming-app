@@ -32,7 +32,13 @@ router.post('/signin', async (req,res) =>{
             return;
         }
         const jwtToken = jwt.sign(user.id, process.env.JWT_SECRET as string || 'default_secret');
-        res.status(200).json({"token":jwtToken, "userId": user.userName});
+        res.cookie('jwt', jwtToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000,
+            sameSite: 'strict',
+          });
+          res.status(200).json({ message: 'Signin successful' });
     } catch (error) {
         res.status(500).json({"error": error})
         return
