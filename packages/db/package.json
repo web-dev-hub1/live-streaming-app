@@ -4,19 +4,18 @@
   "description": "",
   "private": true,
   "main": "index.js",
-  "scripts": {
-    "build": "tsc -b"
-  },
   "exports": {
-    ".": "./src/client.ts"
+    "./client": "./src/client.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.2.1"
+    "@prisma/client": "^6.2.1",
+    "dotenv": "^16.4.7"
   },
   "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.10.5",
     "prisma": "^6.2.1"
   }

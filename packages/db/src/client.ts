@@ -1,12 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import dotenv from 'dotenv';
+dotenv.config({ path: '../../.env' });
 
-//adding this comment to check discord pull integration
-
-declare global {
-  var prisma: PrismaClient | undefined;
-}
-
-
+//@ts-ignore
 export const prisma = globalThis.prisma || new PrismaClient();
-
+//@ts-ignore
 if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma;

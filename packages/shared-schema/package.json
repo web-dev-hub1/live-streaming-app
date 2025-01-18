@@ -1,0 +1,14 @@
+{
+  "name": "@repo/shared-schema",
+  "version": "1.0.0",
+  "exports": {
+    "./sharedSchema":"./src/index.ts"
+  },
+  "dependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.6"
+  }
+}
