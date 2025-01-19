@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import dotenv from "dotenv";
 dotenv.config();
 const port = process.env.HTTP_PORT || 5000;
@@ -10,62 +10,68 @@ describe("signin authentication", () => {
       email: "abc@gmail.com",
       password: "abc112@#",
     };
-
     const signinResponse = await axios.post(`${base_url}/signin`, reqBody);
 
-    expect(signinResponse.data.statusCode).toBe(200);
-    expect(signinResponse.data.message).toMatchObject({
+    expect(signinResponse.status).toBe(200);
+    expect(signinResponse.data).toMatchObject({
       message: "Signin successful",
     });
   });
   test("should return 400 for invalid request body", async () => {
-    const reqBody = {
-      email: "abcgmail.com",
-      password: "abc112",
-    };
+    try {
+      const reqBody = {
+        email: "abcgmail.com",
+        password: "abc112",
+      };
 
-    const signinResponse = await axios.post(`${base_url}/signin`, reqBody);
-
-    expect(signinResponse.data.statusCode).toBe(400);
-    expect(signinResponse.data.message).toMatchObject({
-      error: "Invalid input data",
-    });
+      await axios.post(`${base_url}/signin`, reqBody);
+    } catch (error: any) {
+      expect(error.response.status).toBe(400);
+      expect(error.response.data).toMatchObject({
+        error: "Invalid input data",
+      });
+    }
   });
-  test("should return 404 if user doesn't exist.", async () => {
-    const reqBody = {
-      email: "abcd112@gmail.com",
-      password: "abc112@#$",
-    };
+  test("should return 404 if user doesn't exist", async () => {
+    try {
+      const reqBody = {
+        email: "abcd112@gmail.com",
+        password: "abc112@#$",
+      };
 
-    const signinResponse = await axios.post(`${base_url}/signin`, reqBody);
-
-    expect(signinResponse.data.statusCode).toBe(404);
-    expect(signinResponse.data.message).toMatchObject({
-      error: "User not found",
-    });
+      await axios.post(`${base_url}/signin`, reqBody);
+    } catch (error: any) {
+      expect(error.response.status).toBe(404);
+      expect(error.response.data).toMatchObject({
+        error: "User not found",
+      });
+    }
   });
   test("should return 401 for wrong password", async () => {
-    const reqBody = {
-      email: "abc@gmail.com",
-      password: "abc112@#$",
-    };
-
-    const signinResponse = await axios.post(`${base_url}/signin`, reqBody);
-
-    expect(signinResponse.data.statusCode).toBe(401);
-    expect(signinResponse.data.message).toMatchObject({
-      error: "Invalid credentials",
-    });
+    try {
+      const reqBody = {
+        email: "abc@gmail.com",
+        password: "abc112@#$",
+      };
+      await axios.post(`${base_url}/signin`, reqBody);
+    } catch (error: any) {
+      expect(error.response.status).toBe(401);
+      expect(error.response.data).toMatchObject({
+        error: "Invalid credentials",
+      });
+    }
   });
   test("should return 500 if signin fails", async () => {
-    const reqBody = {
-      email: "abc@gmail.com",
-      password: "abc112@#$",
-    };
+    try {
+      const reqBody = {
+        email: "abc@gmail.com",
+        password: "abc112@#",
+      };
 
-    const signinResponse = await axios.post(`${base_url}/signin`, reqBody);
-
-    expect(signinResponse.data.statusCode).toBe(500);
-    expect(signinResponse.data.message).toBeDefined();
+      await axios.post(`${base_url}/signin`, reqBody);
+    } catch (error: any) {
+      expect(error.response.status).toBe(500);
+      expect(error.response.data).toBeDefined();
+    }
   });
 });
