@@ -32,7 +32,7 @@ router.post('/signin', async (req,res) =>{
             res.status(401).json({"error": "Invalid credentials"});
             return;
         }
-        const jwtToken = jwt.sign({ email: user.email, userName: user.userName }, process.env.JWT_SECRET as string || 'default_secret');
+        const jwtToken = jwt.sign({ email: user.email, userName: user.userName,role:user.role }, process.env.JWT_SECRET as string || 'default_secret');
         res.cookie('jwt', jwtToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -96,5 +96,3 @@ router.post('/signup', async (req,res) =>{
     }
 
 })
-
-

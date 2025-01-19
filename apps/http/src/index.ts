@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import { prisma } from '@repo/db/client'
 import { router } from './routes/v1';
 import dotenv from 'dotenv';
 

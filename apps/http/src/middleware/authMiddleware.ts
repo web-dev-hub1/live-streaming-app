@@ -10,7 +10,7 @@ interface AuthRequest extends Request {
 export const authMiddleware = (
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const token = req.headers["authorization"];
