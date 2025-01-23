@@ -12,7 +12,11 @@ describe("signin authentication", () => {
     };
     const signinResponse = await axios.post(`${base_url}/signin`, reqBody);
 
+    const cookies=signinResponse.headers['set-cookie'];
+    const jwtCookie=cookies?.find((cookie)=>cookie.startsWith('jwt'));
+
     expect(signinResponse.headers["set-cookie"]).toBeDefined();
+    expect(jwtCookie).toBeDefined();
     expect(signinResponse.status).toBe(200);
     expect(signinResponse.data).toMatchObject({
       message: "Signin successful",
