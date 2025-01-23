@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
 const port = process.env.HTTP_PORT || 5000;
@@ -7,11 +7,12 @@ const base_url = `http://localhost:${port}/api/v1`;
 describe("signin authentication", () => {
   test("should return 200 if user signs in successfully!", async () => {
     const reqBody = {
-      email: "abc@gmail.com",
-      password: "abc112@#",
+      email: "lg@gmail.com",
+      password: "lg112@#$",
     };
     const signinResponse = await axios.post(`${base_url}/signin`, reqBody);
 
+    expect(signinResponse.headers["set-cookie"]).toBeDefined();
     expect(signinResponse.status).toBe(200);
     expect(signinResponse.data).toMatchObject({
       message: "Signin successful",
