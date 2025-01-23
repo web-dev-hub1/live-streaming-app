@@ -43,7 +43,8 @@ model Stream {
 }
 
 enum Role {
-  CREATOR
+  SUPER_ADMIN
+  ADMIN
   USER
 }
 
