@@ -1,5 +1,4 @@
-import { signinSchema } from '@repo/shared-schema/sharedSchema';
-import { signupSchema } from '@repo/shared-schema/sharedSchema';
+import { signinSchema,signupSchema  } from '@repo/shared-schema/sharedSchema';
 import { prisma } from '@repo/db/client';
 import { Request, Router } from "express"
 import bcrypt  from "bcrypt";
@@ -95,5 +94,7 @@ router.post('/signin', async (req,res) =>{
     }
 
 })
+
+
 
 
