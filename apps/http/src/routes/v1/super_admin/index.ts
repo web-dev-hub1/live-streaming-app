@@ -10,16 +10,13 @@ import { rolesEnumSchema } from "@repo/shared-schema/sharedSchema";
 export const supRouter : Router = Router();
 
 supRouter.put('/change-role/:userName', authMiddleware,verifyRoleMiddleware(["SUPER_ADMIN"]), async(req, res) => {
-    const targetRole = req.body.role;
-    if(!targetRole){
-        res.status(400).json({"error": "Role is required"})
+    const parsedBody = rolesEnumSchema.safeParse(req.body);
+    if(!parsedBody.success) {
+        res.status(400).json({"error": "Invalid role format"})
         return
     }
-    const zodRole = rolesEnumSchema.safeParse(targetRole)
-    if(!zodRole.success){
-        res.status(400).json({"error": "role type is not correct"})
-        return
-    }
+    const targetRole = parsedBody.data.role;
+    
     const userName = req.params.userName;
     try {
         const targetUser = await prisma.user.findUnique({
