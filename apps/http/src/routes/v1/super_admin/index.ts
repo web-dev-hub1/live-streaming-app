@@ -2,13 +2,24 @@
 import { Router } from "express";
 import { authMiddleware } from "../../../middleware/authMiddleware";
 import { prisma } from "@repo/db/client";
+import { verifyRoleMiddleware } from "../../../middleware/verifyRoleMiddleware";
+import { rolesEnumSchema } from "@repo/shared-schema/sharedSchema";
 
 
 
 export const supRouter : Router = Router();
 
-supRouter.put('/change-role/:userName', authMiddleware, async(req, res) => {
+supRouter.put('/change-role/:userName', authMiddleware,verifyRoleMiddleware(["SUPER_ADMIN"]), async(req, res) => {
     const targetRole = req.body.role;
+    if(!targetRole){
+        res.status(400).json({"error": "Role is required"})
+        return
+    }
+    const zodRole = rolesEnumSchema.safeParse(targetRole)
+    if(!zodRole.success){
+        res.status(400).json({"error": "role type is not correct"})
+        return
+    }
     const userName = req.params.userName;
     try {
         const targetUser = await prisma.user.findUnique({
@@ -20,7 +31,7 @@ supRouter.put('/change-role/:userName', authMiddleware, async(req, res) => {
             return
         }
         if(targetRole === targetUser.role){
-            res.status(400).json({"error": "User already has this role"})
+            res.status(400).json({"error": `User is already ${targetRole}`})
             return
         }
         try {
@@ -37,6 +48,4 @@ supRouter.put('/change-role/:userName', authMiddleware, async(req, res) => {
     } catch (error) {
         res.status(500).json({"Internal error": error})
     }
-
-
 })

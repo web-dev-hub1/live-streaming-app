@@ -60,8 +60,6 @@ router.post('/signup', async (req,res) =>{
     }
 
 })
-
-router.use("/sup", supRouter)
 router.post('/signin', async (req,res) =>{
     const signinData = signinSchema.safeParse(req.body);
     if(!signinData.success){
@@ -97,3 +95,5 @@ router.post('/signin', async (req,res) =>{
     }
 
 })
+
+router.use("/sup", supRouter)
