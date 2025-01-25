@@ -3,18 +3,13 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from 'dotenv';
 
 dotenv.config();
-interface AuthRequest extends Request {
-  user?: JwtPayload;
-}
-
 export const authMiddleware = (
-  req: AuthRequest,
+  req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
-    const token = req.headers["authorization"];
-
+    const token = req.cookies.jwt
     if (!token) {
       res
         .status(401)
