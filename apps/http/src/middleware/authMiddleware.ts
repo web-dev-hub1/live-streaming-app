@@ -9,8 +9,7 @@ export const authMiddleware = (
   next: NextFunction,
 ) => {
   try {
-    const token = req.headers["authorization"];
-
+    const token = req.cookies.jwt
     if (!token) {
       res
         .status(401)
