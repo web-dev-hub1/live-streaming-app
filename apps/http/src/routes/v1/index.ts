@@ -4,6 +4,7 @@ import { Request, Router } from "express"
 import bcrypt  from "bcrypt";
 import dotenv from 'dotenv';
 import jwt from "jsonwebtoken"
+import { supRouter } from './super_admin';
 
 dotenv.config();
 
@@ -94,3 +95,5 @@ router.post('/signin', async (req,res) =>{
     }
 
 })
+
+router.use("/sup", supRouter)
