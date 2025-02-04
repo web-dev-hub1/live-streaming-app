@@ -25,13 +25,10 @@ export const rolesEnumSchema = z.object({
 
 export const sessionSchema = z.object({
   title: z.string().min(3),
-  description: z.string().optional(),
-  startTime: z.date(),
-  endTime: z.date(),
-  coHosts: z.array(),
-  thumbnail: z.string(),
-  slides: z.object({}),
-  videoLink: z.string(),   
-  createdAt: z.date(),  
-  updatedAt: z.date(),
+  description: z.string(),
+  startTime: z.string().datetime(),
+  endTime: z.string().datetime(),
+  thumbnail: z.string().optional(),
+  slides: z.object({}).optional(),
+  videoLink: z.string().optional(),
 }).strict();
