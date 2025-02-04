@@ -4,11 +4,6 @@
   "description": "",
   "private": true,
   "main": "client.js",
-  "scripts": {
-    "build": "tsc -b",
-    "dev": "npm run build && npm run start",
-    "start": "node ./dist/client.js"
-  },
   "exports": {
     "./client": "./src/client.ts"
   },
@@ -16,13 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.2.1",
+    "@prisma/client": "^6.3.0",
     "dotenv": "^16.4.7"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.10.5",
-    "prisma": "^6.2.1",
+    "prisma": "^6.3.0",
     "typescript": "^5.7.3"
   }
 }
