@@ -10,7 +10,8 @@
   "exports": {
     "./styles.css": "./dist/index.css",
     ".": "./src/index.ts",
-    "./utils": "./src/lib/utils.ts"
+    "./utils": "./src/lib/utils.ts",
+    "./input": "./src/components/ui/input.tsx"
   },
   "license": "MIT",
   "scripts": {
