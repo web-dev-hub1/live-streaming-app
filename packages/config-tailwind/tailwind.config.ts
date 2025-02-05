@@ -51,6 +51,7 @@ const config: Omit<Config, 'content'> = {
             },
         },
     },
+    //@ts-ignore
     plugins: [require('tailwindcss-animate')],
 }
 export default config
