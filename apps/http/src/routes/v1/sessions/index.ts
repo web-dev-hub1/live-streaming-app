@@ -11,7 +11,7 @@ export const sesssionRouter: Router = Router();
 sesssionRouter.post("/", authMiddleware, verifyRoleMiddleware(["ADMIN"]), async (req: Request, res) => {
     const sessionData = sessionSchema.safeParse(req.body);
     if(!sessionData.success) {
-        res.status(400).json({"erro": "Invalid input"});
+        res.status(400).json({"error": "Invalid input"});
         return
     }
     try {
