@@ -13,36 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model User {
-//   id        String   @id @unique @default(cuid())
-//   userName  String   @unique
-//   password  String // Changed `Password` to `password` for consistency and removed nullable option
-//   email     String   @unique
-//   myStreams Stream[] @relation("CreatedStreams") // Updated relation name for clarity
-//   coStreams String[]
-//   role      Role     @default(USER)
-//   createdAt DateTime @default(now()) // Added timestamps
-//   updatedAt DateTime @updatedAt
-// }
-
-// model Stream {
-//   id          String    @id @unique @default(cuid())
-//   sessionId   String    @unique
-//   streamTitle String
-//   description String?
-//   startTime   DateTime?
-//   endTime     DateTime?
-//   status      Status    @default(UPCOMING)
-//   creatorId   String
-//   creator     User      @relation("CreatedStreams", fields: [creatorId], references: [id])
-//   coHosts     String[]  
-//   thumbnail   String?
-//   slides      Json?
-//   videoLink   String?
-//   createdAt   DateTime  @default(now()) // Added timestamps
-//   updatedAt   DateTime  @updatedAt
-// }
-
 model User {
   id        String    @id @unique @default(cuid())
   userName  String    @unique

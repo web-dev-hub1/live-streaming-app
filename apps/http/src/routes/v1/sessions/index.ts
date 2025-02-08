@@ -14,18 +14,18 @@ sesssionRouter.post("/", authMiddleware, verifyRoleMiddleware(["ADMIN"]), async 
         res.status(400).json({"error": "Invalid input"});
         return
     }
+    const sessionId = generateSessionId();
+    const creatorId = req.userDetails?.id as string;
+    const startDate = new Date(sessionData.data.startTime);
+    const endDate = new Date(sessionData.data.endTime);
+    const currentDate = new Date();
+    if (startDate >= endDate && startDate < currentDate) {
+        res.status(400).json({
+            "message": "Incorrect Date and Time"
+        })
+        return
+    }
     try {
-        const sessionId = generateSessionId();
-        const creatorId = req.userDetails?.id as string;
-        const startDate = new Date(sessionData.data.startTime);
-        const endDate = new Date(sessionData.data.endTime);
-        const currentDate = new Date();
-        if (startDate >= endDate && startDate < currentDate) {
-            res.status(400).json({
-                "message": "Incorrect Date and Time"
-            })
-            return
-        }
         const stream = await prisma.streams.create({
             data: {
                 streamID: sessionId,
@@ -49,7 +49,7 @@ sesssionRouter.put("/:sessionId/start", authMiddleware,  verifyRoleMiddleware(["
     const sessionId = req.params.sessionId;
     const creatorId = req.userDetails?.id as string;
     try {
-        await prisma.streams.update({
+        await prisma.streams.updateMany({
             where: {
                 creatorId,
                 streamID: sessionId
@@ -71,7 +71,7 @@ sesssionRouter.put("/:sessionId/end", authMiddleware, verifyRoleMiddleware(["ADM
     const sessionId = req.params.sessionId;
     const creatorId = req.userDetails?.id as string;
     try {
-        await prisma.streams.update({
+        await prisma.streams.updateMany({
             where: {
                 creatorId,
                 streamID: sessionId
