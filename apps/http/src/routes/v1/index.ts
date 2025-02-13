@@ -1,10 +1,11 @@
 import { signinSchema,signupSchema  } from '@repo/shared-schema/sharedSchema';
 import { prisma } from '@repo/db/client';
-import { Request, Router } from "express"
+import { Router } from "express"
 import bcrypt  from "bcrypt";
 import dotenv from 'dotenv';
 import jwt from "jsonwebtoken"
 import { supRouter } from './super_admin';
+import { sesssionRouter } from './sessions';
 
 dotenv.config();
 
@@ -95,5 +96,7 @@ router.post('/signin', async (req,res) =>{
     }
 
 })
+
+router.use("/session", sesssionRouter);
 
 router.use("/sup", supRouter)

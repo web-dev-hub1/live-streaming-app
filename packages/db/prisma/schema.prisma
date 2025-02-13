@@ -14,32 +14,39 @@ datasource db {
 }
 
 model User {
-  id        String   @id @unique @default(cuid())
-  userName  String   @unique
-  password  String // Changed `Password` to `password` for consistency and removed nullable option
-  email     String   @unique
-  myStreams Stream[] @relation("CreatedStreams") // Updated relation name for clarity
-  coStreams Stream[] @relation("CoHostedStreams") // Updated relation name for clarity
-  role      Role     @default(USER)
-  createdAt DateTime @default(now()) // Added timestamps
-  updatedAt DateTime @updatedAt
+  id        String    @id @unique @default(cuid())
+  userName  String    @unique
+  password  String
+  email     String    @unique
+  myStreams Streams[]
+  coSession CoHost[]  // Instead of storing Stream IDs, relate it to CoHost table
+  role      Role      @default(USER)
 }
 
-model Stream {
+model Streams {
   id          String    @id @unique @default(cuid())
+  streamID    String    @unique
   streamTitle String
-  description String?
-  startTime   DateTime?
-  endTime     DateTime?
-  status      Status    @default(UPCOMING)
-  creatorId   String
-  creator     User      @relation("CreatedStreams", fields: [creatorId], references: [id])
-  coHosts     User[]    @relation("CoHostedStreams") // Renamed `coCreatorId` to `coHosts` for clarity
+  description String
+  startTime   DateTime
+  endTime     DateTime
+  status      Status?   @default(UPCOMING)
+  creator     User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorId   String    // Stores the userName of the creator
   thumbnail   String?
   slides      Json?
   videoLink   String?
+  coHosts     CoHost[]  // Relate to CoHost table
   createdAt   DateTime  @default(now()) // Added timestamps
   updatedAt   DateTime  @updatedAt
+}
+
+model CoHost {
+  id        String  @id @unique @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  streamId  String
+  stream    Streams @relation(fields: [streamId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
