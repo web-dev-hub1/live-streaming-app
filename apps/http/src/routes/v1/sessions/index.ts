@@ -49,7 +49,7 @@ sesssionRouter.put("/:sessionId/start", authMiddleware,  verifyRoleMiddleware(["
     const sessionId = req.params.sessionId;
     const creatorId = req.userDetails?.id as string;
     try {
-        await prisma.streams.updateMany({
+        const updatedStream = await prisma.streams.updateMany({
             where: {
                 creatorId,
                 streamID: sessionId
@@ -58,11 +58,15 @@ sesssionRouter.put("/:sessionId/start", authMiddleware,  verifyRoleMiddleware(["
                 status: 'RUNNING'
             }
         })
+        if(updatedStream.count === 0){
+            res.status(404).json({message: "Invalid Session ID"})
+        }
         return
     } catch(error) {
-        res.status(400).json({
-            "message": "Invalid session ID"
-        })
+        res.status(500).json({
+            error: 'An error occurred while updating the stream status',
+            details: error
+        });
         return
     }
 })
@@ -71,7 +75,7 @@ sesssionRouter.put("/:sessionId/end", authMiddleware, verifyRoleMiddleware(["ADM
     const sessionId = req.params.sessionId;
     const creatorId = req.userDetails?.id as string;
     try {
-        await prisma.streams.updateMany({
+        const updatedStream = await prisma.streams.updateMany({
             where: {
                 creatorId,
                 streamID: sessionId
@@ -81,11 +85,15 @@ sesssionRouter.put("/:sessionId/end", authMiddleware, verifyRoleMiddleware(["ADM
                 videoLink: 'https://cat.png'    //dummy link
             }
         })
+        if(updatedStream.count === 0){
+            res.status(404).json({message: "Invalid Session ID"})
+        }
         return
     } catch(error) {
-        res.status(400).json({
-            "message": "Invalid session ID"
-        })
+        res.status(500).json({
+            error: 'An error occurred while updating the stream status',
+            details: error
+        });
         return
     }
 })
