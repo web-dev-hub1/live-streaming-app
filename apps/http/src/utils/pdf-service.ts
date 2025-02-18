@@ -11,23 +11,40 @@ export const convertPdfToImages = (
     );
     const process = spawn("python", [scriptPath, outputFolder]);
     let errors:string[] = [];
+    let stdoutData = ""
+    let timeout:NodeJS.Timeout
+    timeout = setTimeout(() => {
+      cleanup();
+      reject("Process timed out");
+    }, 30000);
+    const cleanup = () => {
+      clearTimeout(timeout);
+      process.kill();
+    };
     process.stdin.write(pdfBuffer);
     process.stdin.end();
     process.stdout.on("data", (data) => {
-      try {
-        const imagePaths:string[] = JSON.parse(data.toString())
-        resolve(imagePaths)
-      } catch (error) {
-        reject(`JSON Parse Error: ${error}`)
-      }
+      stdoutData += data.toString();
     });
+
     process.stderr.on("data", (errorData) => {
       errors.push(errorData.toString());
     });
     process.on("close", (code) => {
-      if (code !== 0) {
-        reject(`Error: ${errors.join(", ")}`);
+      cleanup();
+      if (code === 0) {
+        try {
+          resolve(JSON.parse(stdoutData));
+        } catch (error) {
+          reject(`JSON Parse Error: ${error}`);
+        }
+      } else {
+        reject(`Process exited with code ${code}: ${errors.join(", ")}`);
       }
+    });
+    process.on("error", (err) => {
+      cleanup();
+      reject(`Process failed to start: ${err.message}`);
     });
   });
 };
