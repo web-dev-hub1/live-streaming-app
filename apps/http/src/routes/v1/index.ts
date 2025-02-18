@@ -1,3 +1,4 @@
+import { sesssionRouter } from "./sessions";
 import { signinSchema,signupSchema  } from '@repo/shared-schema/sharedSchema';
 import { prisma } from '@repo/db/client';
 import { Router } from "express"
@@ -5,62 +6,57 @@ import bcrypt  from "bcrypt";
 import dotenv from 'dotenv';
 import jwt from "jsonwebtoken"
 import { supRouter } from './super_admin';
-import { sesssionRouter } from './sessions';
 
 dotenv.config();
 
 
 export const router: Router = Router();
 
-router.post('/signup', async (req,res) =>{
-    const signupData = signupSchema.safeParse(req.body);
-    if(!signupData.success){
-        res.status(400).json({"error": "Invalid input data"});
-        return
+router.post("/signup", async (req, res) => {
+  const signupData = signupSchema.safeParse(req.body);
+  if (!signupData.success) {
+    res.status(400).json({ error: "Invalid input data" });
+    return;
+  }
+  try {
+    const userWithEmail = await prisma.user.findUnique({
+      where: {
+        email: signupData.data.email,
+      },
+    });
+    if (userWithEmail) {
+      res.status(409).json({ error: "Email already exists" });
+      return;
     }
-    try {
-        const userWithEmail = await prisma.user.findUnique(
-            {
-                where:{
-                    email: signupData.data.email
-                }
-            }
-        )
-        if(userWithEmail){
-            res.status(409).json({"error": "Email already exists"});
-            return
-        }
-        const userWithId = await prisma.user.findUnique({
-            where:{
-                userName: signupData.data.userName
-            }
-        })
-        if(userWithId){
-            res.status(409).json({"error": "User ID already exists"});
-            return
-        }
-        const hashedPassword = await bcrypt.hash(signupData.data.password, 10);
-        const newUser = await prisma.user.create({
-            data:{
-                email: signupData.data.email,
-                userName: signupData.data.userName,
-                password: hashedPassword,
-                role:"USER"
-
-            }
-        })
-        res.status(201).json({
-            "message": "User created successfully",
-            "userName": newUser.userName,
-            "email": newUser.email,
-            "role": newUser.role
-        })
-        console.log(newUser);
-    } catch (error) {
-        res.status(500).json({"internal error": error})
+    const userWithId = await prisma.user.findUnique({
+      where: {
+        userName: signupData.data.userName,
+      },
+    });
+    if (userWithId) {
+      res.status(409).json({ error: "User ID already exists" });
+      return;
     }
-
-})
+    const hashedPassword = await bcrypt.hash(signupData.data.password, 10);
+    const newUser = await prisma.user.create({
+      data: {
+        email: signupData.data.email,
+        userName: signupData.data.userName,
+        password: hashedPassword,
+        role: "USER",
+      },
+    });
+    res.status(201).json({
+      message: "User created successfully",
+      userName: newUser.userName,
+      email: newUser.email,
+      role: newUser.role,
+    });
+    console.log(newUser);
+  } catch (error) {
+    res.status(500).json({ "internal error": error });
+  }
+});
 router.post('/signin', async (req,res) =>{
     const signinData = signinSchema.safeParse(req.body);
     if(!signinData.success){

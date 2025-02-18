@@ -1,7 +1,6 @@
 import { JwtPayload } from "jsonwebtoken";
-import { Request as expressRequest } from "express";
-
-export interface userDetails {
+import { Request as ExpressRequest } from "express";
+interface userDetails {
   email: string;
   password: string;
   id: string;
@@ -12,7 +11,7 @@ export interface userDetails {
 }
 //Auth request Middleware
 declare module "express" {
-  export interface Request extends expressRequest {
+  export interface Request extends ExpressRequest {
     user?: JwtPayload;
     userDetails?: userDetails;
   }
