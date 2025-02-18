@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
-import { prisma } from "@repo/db/client";
+import { prisma, Role } from "@repo/db/client";
 import { NextFunction } from "express";
 dotenv.config();
-export const verifyRoleMiddleware = (roles:string[]) => {
+export const verifyRoleMiddleware = (roles:Role[]) => {
   return async (req:Request, res: Response, next: NextFunction) => {
     try {
       const user = await prisma.user.findUnique({

@@ -1,4 +1,9 @@
-import { sessionIdSchema, signinSchema, signupSchema, slidesPdfSchema } from "@repo/shared-schema/sharedSchema";
+import {
+  sessionIdSchema,
+  signinSchema,
+  signupSchema,
+  slidesPdfSchema,
+} from "@repo/shared-schema/sharedSchema";
 import { prisma } from "@repo/db/client";
 import { Request, Router } from "express";
 import bcrypt from "bcrypt";
@@ -10,7 +15,8 @@ import multer from "multer";
 import ImageKit from "imagekit";
 import { convertPdfToImages } from "../../utils/pdf-service";
 import path from "path";
-import fs from 'fs';
+import fs from "fs";
+import { verifyRoleMiddleware } from "../../middleware/verifyRoleMiddleware";
 const upload = multer();
 dotenv.config();
 
@@ -107,94 +113,96 @@ router.post("/signin", async (req, res) => {
   }
 });
 router.post(
-  "/session/slides/pdf",
+  "/session/:sessionId/slides/pdf",
   upload.single("pdf"),
   authMiddleware,
+  verifyRoleMiddleware(["ADMIN"]),
   async (req: Request, res) => {
-    const sessionValidation = sessionIdSchema.safeParse({ sessionId: req.params.sessionId });
+    const sessionValidation = sessionIdSchema.safeParse({
+      sessionId: req.params.sessionId,
+    });
     if (!sessionValidation.success) {
       res.status(400).json({ message: "Invalid session ID format" });
-      return
+      return;
     }
-    const sessionId = sessionValidation.data.sessionId
+    const sessionId = sessionValidation.data.sessionId;
 
     if (!req.file) {
       res.status(400).json({ message: "No PDF file provided" });
       return;
     }
-    const pdfValidation = slidesPdfSchema.safeParse({pdf:req.file});
-    if(!pdfValidation.success){
-      res.status(400).json({message:pdfValidation.error.message})
-      return
-    }
-    
-    const findUser = await prisma.user.findUnique({
-      where: {
-        email: req.user?.email,
-      },
-    });
-    if (!findUser) {
-      res.status(400).json({ message: "User not found!" });
+    const pdfValidation = slidesPdfSchema.safeParse({ pdf: req.file });
+    if (!pdfValidation.success) {
+      res.status(400).json({ message: pdfValidation.error.message });
       return;
     }
-    const UserCreatorOrcohost = await prisma.stream.findFirst({
+
+    const userCreatorOrcohost = await prisma.stream.findFirst({
       where: {
         OR: [
-          { creatorId: findUser?.id },
-          { coHosts: { some: { id: findUser?.id } } },
+          { creatorId: req.userDetails?.id },
+          { coHosts: { some: { id: req.userDetails?.id } } },
         ],
         id: sessionId,
       },
     });
 
-    if (!UserCreatorOrcohost) {
-      res
-        .status(403)
-        .json({ message: "User is not authorized to access this session" });
+    if (!userCreatorOrcohost) {
+      res.status(403).json({ message: "User is not authorized to access this session" });
       return;
     }
     const pdfBuffer = req.file?.buffer;
     const decomposeAndUploadPDF = async (pdfBuffer: Buffer) => {
       try {
         const outputFolder = path.resolve(__dirname, "../../output-images/");
-        console.log("Output folder path:", outputFolder);
-        const images = await convertPdfToImages(pdfBuffer, outputFolder);
-
-        let imageKitUrls:any = []
-        const files = await fs.promises.readdir(outputFolder);
-          const imageFiles = files.filter(file => file.endsWith(".png"));
-          for(const file of imageFiles){
-            const imagePath = path.join(outputFolder,file)
-            try {
-              const fileBuffer = fs.readFileSync(imagePath)
-              const response = await imagekit.upload({
-                file:fileBuffer,
-                fileName:file,
-                folder:'/pdf-images'
-              })
-              imageKitUrls.push({
-                type:"image",
-                payload:{
-                  imageUrl:response.url
-                }
-              })
-              console.log(`✅ Uploaded ${file}:`, response.url)
-            } catch (error) {
-              console.log(`❌ Error uploading ${file}:`, error)
-            }
+        const AllImagePaths = await convertPdfToImages(pdfBuffer, outputFolder);
+        let imageKitUrls: any[] = []; 
+        for (const imagePath of AllImagePaths) {
+          try {
+            const ImageBuffer = fs.readFileSync(imagePath);
+            const response = await imagekit.upload({
+              file: ImageBuffer,
+              fileName: path.basename(imagePath),
+              folder: "/pdf-images",
+              
+            });
+            imageKitUrls.push({
+              type: "image",
+              payload: {
+                imageUrl: response.url,
+              },
+            });
+            console.log(`✅ Uploaded ${imagePath}:`, response.url);
+          } catch (error) {
+            console.log(`❌ Error uploading ${imagePath}:`, error);
           }
-        return imageKitUrls
-      } catch (error:any) {
-        throw error
+        }
+        return imageKitUrls;
+      } catch (error: any) {
+        throw error;
       }
     };
     try {
       const slides: any = await decomposeAndUploadPDF(pdfBuffer as Buffer);
-      res.status(200).json({ message: "PDF added successfully", slides });
-      const outputFolder = path.resolve(__dirname, "../../output-images/");
-      await fs.promises.rm(outputFolder, { recursive: true, force: true });
-      console.log(`🗑️ Removed output folder: ${outputFolder}`);
-      return;
+      try {
+        await prisma.stream.update({
+          where: {
+            id: sessionId,
+          },
+          data: {
+            slides: slides,
+          },
+        });
+        res.status(200).json({ message: "PDF added successfully", slides });
+        return;
+      } catch (error) {
+        res.status(500).json({ message: "Internal Server Error", error });
+        return;
+      } finally {
+        const outputFolder = path.resolve(__dirname, "../../output-images/");
+        await fs.promises.rm(outputFolder, { recursive: true, force: true });
+        console.log(`🗑️ Removed output folder: ${outputFolder}`);
+      }
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error", error });
       return;

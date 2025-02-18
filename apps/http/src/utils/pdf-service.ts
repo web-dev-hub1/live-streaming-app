@@ -10,26 +10,23 @@ export const convertPdfToImages = (
       "../../../../packages/pdf2Image/src/convert.py"
     );
     const process = spawn("python", [scriptPath, outputFolder]);
-    let output = "";
-    let error = "";
+    let errors:string[] = [];
     process.stdin.write(pdfBuffer);
     process.stdin.end();
     process.stdout.on("data", (data) => {
-      output += data.toString();
+      try {
+        const imagePaths:string[] = JSON.parse(data.toString())
+        resolve(imagePaths)
+      } catch (error) {
+        reject(`JSON Parse Error: ${error}`)
+      }
     });
-    process.stderr.on("data", (data) => {
-      error += data.toString();
+    process.stderr.on("data", (errorData) => {
+      errors.push(errorData.toString());
     });
     process.on("close", (code) => {
-      if (code === 0) {
-        try {
-          const result = JSON.parse(output);
-          resolve(result.images);
-        } catch (parseError) {
-          reject(`JSON Parse Error: ${parseError}`);
-        }
-      } else {
-        reject(`Error: ${error}`);
+      if (code !== 0) {
+        reject(`Error: ${errors.join(", ")}`);
       }
     });
   });
