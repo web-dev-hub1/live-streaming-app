@@ -6,8 +6,8 @@ interface userDetails {
   id: string;
   userName: string;
   role: $Enums.Role;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 //Auth request Middleware
 declare module "express" {
